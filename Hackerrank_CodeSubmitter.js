@@ -35,6 +35,7 @@ let currentPage;
 
     for(let i=0;i<answers.length;i++){
         let ansObj=answers[i];
+        // we will search for the question anme and then submit the code of that question only
         await questionSolver(ansObj.qName,ansObj.soln,currentPageUrl);
     }
 })()
@@ -54,11 +55,19 @@ async function waitAndClick(selector){
 async function questionSolver(questionName,code,currentPageUrl){
     await currentPage.goto(currentPageUrl);
     // await cTab.evaluate(consoleFn, ".challengecard-title", qName);
+
+    // evaluate fxn helps to get elemnts from the web page
+    // getallName fxn will check for the matching name of the question and then click on that question 
     await currentPage.evaluate(getallName,".challengecard-title",questionName); 
+    // we are waiting for you question page to load
     await currentPage.waitForSelector("div[data-attr2='Submissions']", { visible: true });
+    //clicked on custom click
     await waitAndClick(".checkbox-input");
+    // waiting for the text area of custom area.
     await currentPage.waitForSelector(".custom-input.theme-old.size-medium",{visible:true});
+    // typing that code in the custom input text area
     await currentPage.type(".custom-input.theme-old.size-medium",code,{delay:10});
+    //now below steps are to copy the code form custom input to code editior
     await currentPage.keyboard.down("Control");
     await currentPage.keyboard.press("a");
     await currentPage.keyboard.press("x");
@@ -70,11 +79,15 @@ async function questionSolver(questionName,code,currentPageUrl){
 }
 
 function getallName(selector,questionName){
+    // we got the name of all the questions on the page
     let nameOfQuestions=document.querySelectorAll(selector);
+
     for(let i=0;i<nameOfQuestions.length;i++){
         let qname=nameOfQuestions[i].innerText.split("\n")[0];
+        // we are checking the question we get from the array and on the page are same of not
         if(qname==questionName){
-            console.log(qname);
+            // console.log(qname);
+            // if they are same then we are clicking on that question.
             return nameOfQuestions[i].click();
         }
     }
